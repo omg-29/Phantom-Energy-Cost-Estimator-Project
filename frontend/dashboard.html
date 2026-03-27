@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your rooms and track phantom energy costs across your home.">
+  <title>Dashboard — Phantom Energy Cost Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="brand">
+        <span>👻⚡</span>
+        <span>Phantom Energy</span>
+      </div>
+      <div class="nav-actions">
+        <div class="user-badge">
+          <div class="avatar" id="user-avatar">U</div>
+          <span id="user-email">user@example.com</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Your Rooms</h1>
+      <p>Each room holds independent phantom energy calculations. Create rooms for different areas of your home or office.</p>
+    </div>
+
+    <!-- Rooms Grid -->
+    <div class="rooms-grid" id="rooms-container">
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading rooms...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- New Room Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h2>🏠 Create New Room</h2>
+      <form id="new-room-form">
+        <div class="form-group">
+          <label for="room-name">Room Name</label>
+          <input type="text" class="form-input" id="room-name" placeholder="e.g. Living Room, Home Office..." required maxlength="60">
+        </div>
+        <div class="form-group">
+          <label for="room-state">Your State (for electricity rate)</label>
+          <select class="form-input" id="room-state" required>
+            <option value="">Loading states...</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

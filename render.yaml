@@ -1,0 +1,41 @@
+# render.yaml — Deploy Phantom Energy Cost Calculator to Render
+# ==============================================================
+# This file configures two services:
+#   1. FastAPI backend as a Web Service
+#   2. Frontend as a Static Site
+
+services:
+  # ── Backend API ────────────────────────────────────────────
+  - type: web
+    name: phantom-energy-api
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+    healthCheckPath: /health
+    plan: free
+
+  # ── Frontend Static Site ───────────────────────────────────
+  - type: web
+    name: phantom-energy-frontend
+    runtime: static
+    buildCommand: echo "No build step needed"
+    staticPublishPath: frontend
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    plan: free

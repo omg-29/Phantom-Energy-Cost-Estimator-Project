@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculate phantom energy consumption, financial cost, and CO₂ emissions for your idle appliances.">
+  <title>Room Calculator — Phantom Energy Cost Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="brand">
+        <span>👻⚡</span>
+        <span>Phantom Energy</span>
+      </div>
+      <div class="nav-actions">
+        <div class="user-badge">
+          <div class="avatar" id="user-avatar">U</div>
+          <span id="user-email">user@example.com</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Room Header -->
+    <div class="page-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 id="room-title">Loading...</h1>
+        <p id="room-state-info" class="text-muted">—</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="back-btn">← Back to Dashboard</button>
+    </div>
+
+    <!-- ─── Appliance Form Section ──────────────────────────── -->
+    <section class="glass-card glass-card--static mb-lg">
+      <h2 style="margin-bottom:0.5rem;">⚡ Add Your Appliances</h2>
+      <p class="text-sm text-muted mb-lg">Select the idle devices in this room and we'll calculate the phantom energy they waste.</p>
+
+      <!-- Dynamic Appliance Entries -->
+      <div id="appliances-container"></div>
+
+      <!-- Energy Rate -->
+      <div class="glass-card glass-card--static" style="margin-top:1.5rem; background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2);">
+        <div class="appliance-fields" style="align-items: end;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="energy-rate">💡 1 Unit Energy Price (₹/kWh)</label>
+            <input type="number" class="form-input" id="energy-rate" placeholder="e.g. 7.50" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <p class="text-sm text-muted">Default is set to your state's average rate. Update this based on your actual electricity bill.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="calc-actions">
+        <button class="btn btn-ghost" id="add-appliance-btn">
+          ➕ Add Appliance
+        </button>
+        <button class="btn btn-success btn-lg" id="calculate-btn" style="flex:2;">
+          ⚡ Calculate Phantom Cost
+        </button>
+      </div>
+    </section>
+
+    <!-- ─── Results Section (Hidden Initially) ──────────────── -->
+    <section id="results-section" class="results-section hidden">
+
+      <!-- Header & Leakage Score -->
+      <div class="results-header">
+        <h2>📊 Your Phantom Energy Report</h2>
+        <p class="text-muted">Here's what your idle devices are costing you</p>
+        <div id="leakage-badge" class="leakage-badge low">🟢 Low Leakage</div>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="metrics-grid">
+        <div class="glass-card metric-card glass-card--static amber">
+          <div class="metric-label">Total Standby</div>
+          <div class="metric-value" id="metric-standby-watts">—</div>
+          <div class="metric-unit">watts</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static cyan">
+          <div class="metric-label">Idle Energy / Day</div>
+          <div class="metric-value" id="metric-kwh-day">—</div>
+          <div class="metric-unit">kWh</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static blue">
+          <div class="metric-label">Cost / Day</div>
+          <div class="metric-value" id="metric-cost-day">—</div>
+          <div class="metric-unit">INR</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static purple">
+          <div class="metric-label">Cost / Month</div>
+          <div class="metric-value" id="metric-cost-month">—</div>
+          <div class="metric-unit">INR</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static red">
+          <div class="metric-label">Cost / Year</div>
+          <div class="metric-value" id="metric-cost-year">—</div>
+          <div class="metric-unit">INR</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static green">
+          <div class="metric-label">CO₂ / Day</div>
+          <div class="metric-value" id="metric-co2-day">—</div>
+          <div class="metric-unit">kg CO₂</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static amber">
+          <div class="metric-label">CO₂ / Month</div>
+          <div class="metric-value" id="metric-co2-month">—</div>
+          <div class="metric-unit">kg CO₂</div>
+        </div>
+        <div class="glass-card metric-card glass-card--static red">
+          <div class="metric-label">CO₂ / Year</div>
+          <div class="metric-value" id="metric-co2-year">—</div>
+          <div class="metric-unit">kg CO₂</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="glass-card chart-container glass-card--static">
+          <h3>💰 Financial Cost</h3>
+          <canvas id="cost-chart"></canvas>
+        </div>
+        <div class="glass-card chart-container glass-card--static">
+          <h3>🌍 CO₂ Emissions</h3>
+          <canvas id="co2-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Breakdown Pie (shown if multiple appliances) -->
+      <div id="breakdown-chart-container" class="glass-card glass-card--static mb-lg hidden">
+        <h3 style="text-align:center; margin-bottom:1.5rem;">🔍 Cost Breakdown by Appliance (Yearly)</h3>
+        <div style="max-width:450px; margin:0 auto;">
+          <canvas id="breakdown-pie-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Breakdown Table -->
+      <div class="glass-card glass-card--static mb-lg">
+        <h3 style="margin-bottom:1rem;">📋 Detailed Breakdown</h3>
+        <div style="overflow-x:auto;">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>Appliance</th>
+                <th>Standby</th>
+                <th>Idle Hrs</th>
+                <th>kWh/Day</th>
+                <th>Cost/Day</th>
+                <th>Cost/Month</th>
+                <th>Cost/Year</th>
+                <th>CO₂/Year</th>
+              </tr>
+            </thead>
+            <tbody id="breakdown-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ─── History Section ─────────────────────────────────── -->
+    <section class="glass-card glass-card--static" style="margin-top:2rem;">
+      <h3 style="margin-bottom:1rem;">🕓 Calculation History</h3>
+      <div id="history-container">
+        <p class="text-muted text-sm" style="padding:1rem;">No calculations yet. Add appliances above and hit Calculate!</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/room.js"></script>
+</body>
+</html>
