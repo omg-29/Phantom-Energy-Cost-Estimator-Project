@@ -6,7 +6,7 @@
 
 const SUPABASE_URL = 'https://fuygwuzxicmhfdwjfuja.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1eWd3dXp4aWNtaGZkd2pmdWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1OTQ0MjQsImV4cCI6MjA5MDE3MDQyNH0.w8hg0H7p1MlDoFKoWtD4TqejD3XUfmd7FvFa0von8pc';
-const API_BASE_URL = 'http://127.0.0.1:8000';  // FastAPI backend
+const API_BASE_URL = 'https://phantom-energy-cost-estimator-be.onrender.com';  // FastAPI backend
 
 // Initialize Supabase client
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
